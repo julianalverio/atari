@@ -90,6 +90,9 @@ class Trainer(object):
 
             self.policy_net.optimizeModel(self.target_net)
             time_delta = (datetime.datetime.now() - start).total_seconds()
+            self.writer.add_scalar('Score', self.score, self.episode)
+            self.writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), self.episode)
+            self.writer.add_scalar('Epsilon', self.policy_net.epsilon_tracker._epsilon, self.episode)
             self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon, time_delta])
             if self.episode >= HYPERPARAMS['episodes']:
                 return
