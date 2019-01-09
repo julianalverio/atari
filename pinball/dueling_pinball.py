@@ -118,10 +118,9 @@ class Trainer(object):
 if __name__ == "__main__":
     # set up which GPU to use
     parser = argparse.ArgumentParser()
-    # parser.add_argument('gpu', type=int)
+    parser.add_argument('gpu', type=int)
     args = parser.parse_args()
-    # gpu_num = args.gpu
-    gpu_num = '1'
+    gpu_num = args.gpu
     print('GPU:', gpu_num)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
     # random seeds
