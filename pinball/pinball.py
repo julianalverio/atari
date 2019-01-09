@@ -4,6 +4,8 @@ import gym
 import csv
 from tensorboardX import SummaryWriter
 import copy
+import sys
+sys.path.insert('..')
 from DQN import *
 from wrappers import wrap_dqn
 import argparse
