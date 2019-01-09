@@ -18,7 +18,7 @@ HYPERPARAMS = {
         'replay_size':      10000,
         'replay_initial':   9000,
         'target_net_sync':  1000,
-        'epsilon_frames':   10**5,
+        'epsilon_frames':   10**7,
         'epsilon_start':    1.0,
         'epsilon_final':    0.02,
         'learning_rate':    0.0001,
@@ -59,7 +59,8 @@ class EpsilonTracker:
     def epsilon(self):
         old_epsilon = self._epsilon
         self._epsilon -= self.epsilon_delta
-        return max(old_epsilon, self.epsilon_final)
+        self._epsilon = max(old_epsilon, self.epsilon_final)
+        return self._epsilon
 
 
 
