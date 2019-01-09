@@ -126,9 +126,9 @@ class DQN(nn.Module):
 
 
 
-class Dueling_DQN(nn.Module):
-    def __init__(self, input_shape, num_actions):
-        super(Dueling_DQN, self).__init__()
+class Dueling_DQN(DQN):
+    def __init__(self, input_shape, num_actions, device):
+        super(Dueling_DQN, self).__init__(input_shape, num_actions, device)
         self.num_actions = num_actions
 
         self.conv = nn.Sequential(
@@ -153,6 +153,13 @@ class Dueling_DQN(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=512, out_features=1)
         )
+
+        self.num_actions = num_actions
+        self.counter = 0
+        self.device = device
+        self.memory = ReplayMemory(HYPERPARAMS['replay_size'])
+        self.epsilon_tracker = EpsilonTracker()
+        self.optimizer = optim.Adam(self.parameters(), lr=HYPERPARAMS['learning_rate'])
 
     def forward(self, x):
         x = self.conv(x).view(x.size()[0], -1)
