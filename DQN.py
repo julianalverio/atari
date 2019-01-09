@@ -16,7 +16,7 @@ torch.cuda.manual_seed_all(5)
 
 HYPERPARAMS = {
         'replay_size':      10000,
-        'replay_initial':   10000,
+        'replay_initial':   9000,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
         'epsilon_start':    1.0,
