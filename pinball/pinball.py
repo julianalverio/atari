@@ -9,6 +9,7 @@ sys.path.insert(0, '..')
 from DQN import *
 from wrappers import wrap_dqn
 import argparse
+import datetime
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
@@ -76,6 +77,7 @@ class Trainer(object):
 
 
     def train(self):
+        start = datetime.datetime.now()
         while True:
             game_over = self.addExperience()
             if game_over:
@@ -88,7 +90,8 @@ class Trainer(object):
                 continue
 
             self.policy_net.optimizeModel(self.target_net)
-            self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon])
+            time_delta = (datetime.datetime.now() - start).total_seconds()
+            self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon, time_delta])
             if self.episode >= HYPERPARAMS['episodes']:
                 return
 
