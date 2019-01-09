@@ -5,7 +5,7 @@ import csv
 from tensorboardX import SummaryWriter
 import copy
 import sys
-sys.path.insert('..')
+sys.path.insert(0, '..')
 from DQN import *
 from wrappers import wrap_dqn
 import argparse
