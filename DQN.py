@@ -24,7 +24,7 @@ HYPERPARAMS = {
         'learning_rate':    0.0001,
         'gamma':            0.99,
         'batch_size':       32,
-        'episodes':         1000
+        'episodes':         10000
 }
 
 TRANSITION = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))

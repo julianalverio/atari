@@ -14,6 +14,7 @@ import datetime
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 from DQN import HYPERPARAMS
+from tensorboardX import SummaryWriter
 
 
 
@@ -51,11 +52,12 @@ class Trainer(object):
         self.score = 0
         self.batch_size = HYPERPARAMS['batch_size']
 
-        csv_file = open('dueling_dqn.csv', 'w+')
-        self.writer = csv.writer(csv_file)
+        self.writer = SummaryWriter('results/dueling')
 
 
     def preprocess(self, state):
+        self.env.render(mode='human')
+        import time; time.sleep(0.008)
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         return state.float() / 256
 
@@ -90,6 +92,9 @@ class Trainer(object):
 
             self.policy_net.optimizeModel(self.target_net)
             time_delta = (datetime.datetime.now() - start).total_seconds()
+            self.writer.add_scalar('Score', self.score, self.episode)
+            self.writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), self.episode)
+            self.writer.add_scalar('Epsilon', self.policy_net.epsilon_tracker._epsilon, self.episode)
             self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon, time_delta])
             if self.episode >= HYPERPARAMS['episodes']:
                 return
@@ -118,9 +123,10 @@ class Trainer(object):
 if __name__ == "__main__":
     # set up which GPU to use
     parser = argparse.ArgumentParser()
-    parser.add_argument('gpu', type=int)
+    # parser.add_argument('gpu', type=int)
     args = parser.parse_args()
-    gpu_num = args.gpu
+    # gpu_num = args.gpu
+    gpu_num = '1'
     print('GPU:', gpu_num)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
     # random seeds
