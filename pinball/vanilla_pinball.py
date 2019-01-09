@@ -14,6 +14,7 @@ import datetime
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 from DQN import HYPERPARAMS
+from tensorboardX import SummaryWriter
 
 
 
@@ -43,7 +44,7 @@ class Trainer(object):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.env = gym.make('AtlantisNoFrameskip-v4')
         self.env = wrap_dqn(self.env)
-        self.policy_net = Dueling_DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
+        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.reward_tracker = RewardTracker()
         self.episode = 0
@@ -51,8 +52,7 @@ class Trainer(object):
         self.score = 0
         self.batch_size = HYPERPARAMS['batch_size']
 
-        csv_file = open('vanilla_dqn.csv', 'w+')
-        self.writer = csv.writer(csv_file)
+        self.writer = SummaryWriter('results/vanilla')
 
 
     def preprocess(self, state):
