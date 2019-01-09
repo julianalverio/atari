@@ -1,29 +1,17 @@
 #!/usr/bin/env python3
-import torch
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(5)
-torch.cuda.manual_seed_all(5)
-import random
-random.seed(5)
-import numpy as np
-np.random.seed(5)
 
 import gym
-import torch
 import csv
-
 from tensorboardX import SummaryWriter
-
-import torch.nn as nn
 import copy
-from collections import namedtuple
-from torch.autograd import Variable
 from DQN import *
 from wrappers import wrap_dqn
+import argparse
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 from DQN import HYPERPARAMS
+
 
 
 class RewardTracker:
@@ -99,6 +87,8 @@ class Trainer(object):
 
             self.policy_net.optimizeModel(self.target_net)
             self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon])
+            if self.episode >= HYPERPARAMS['episodes']:
+                return
 
 
 
@@ -122,6 +112,20 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
+    # set up which GPU to use
+    parser = argparse.ArgumentParser()
+    parser.add_argument('gpu', type=int)
+    args = parser.parse_args()
+    gpu_num = args.gpu
+    print('GPU:', gpu_num)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
+    # random seeds
+    np.random.seed(5)
+    random.seed(5)
+    torch.backends.cudnn.deterministic = True
+    torch.manual_seed(5)
+    torch.cuda.manual_seed_all(5)
+
     trainer = Trainer()
     print('Trainer Initialized')
     trainer.train()

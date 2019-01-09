@@ -1,11 +1,17 @@
 import torch
-import torch.nn as nn
 import random
 import numpy as np
+import torch.nn as nn
 from torch.autograd import Variable
 from collections import namedtuple
-import copy
 import torch.optim as optim
+
+np.random.seed(5)
+random.seed(5)
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(5)
+torch.cuda.manual_seed_all(5)
+
 
 
 HYPERPARAMS = {
@@ -17,7 +23,8 @@ HYPERPARAMS = {
         'epsilon_final':    0.02,
         'learning_rate':    0.0001,
         'gamma':            0.99,
-        'batch_size':       32
+        'batch_size':       32,
+        'episodes':         1000
 }
 
 TRANSITION = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
