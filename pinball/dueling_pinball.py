@@ -41,7 +41,7 @@ class RewardTracker:
 class Trainer(object):
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.env = gym.make('VideoPinballNoFrameskip-v4')
+        self.env = gym.make('AtlantisNoFrameskip-v4')
         self.env = wrap_dqn(self.env)
         self.policy_net = Dueling_DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
@@ -118,9 +118,10 @@ class Trainer(object):
 if __name__ == "__main__":
     # set up which GPU to use
     parser = argparse.ArgumentParser()
-    parser.add_argument('gpu', type=int)
+    # parser.add_argument('gpu', type=int)
     args = parser.parse_args()
-    gpu_num = args.gpu
+    # gpu_num = args.gpu
+    gpu_num = '1'
     print('GPU:', gpu_num)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
     # random seeds
