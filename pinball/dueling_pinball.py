@@ -56,8 +56,6 @@ class Trainer(object):
 
 
     def preprocess(self, state):
-        self.env.render(mode='human')
-        import time; time.sleep(0.008)
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         return state.float() / 256
 
