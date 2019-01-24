@@ -27,7 +27,7 @@ from collections import namedtuple
 from torch.autograd import Variable
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 
 HYPERPARAMS = {
