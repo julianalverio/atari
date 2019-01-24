@@ -10,6 +10,7 @@ from wrappers import wrap_dqn
 import argparse
 import datetime
 from DQN import HYPERPARAMS
+import os
 
 NUM_EPISODES = 700
 
