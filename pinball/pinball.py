@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import gym
-import csv
 from tensorboardX import SummaryWriter
 import copy
 import sys
@@ -10,11 +9,9 @@ from DQN import *
 from wrappers import wrap_dqn
 import argparse
 import datetime
-
-
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 from DQN import HYPERPARAMS
 
+NUM_EPISODES = 700
 
 
 class RewardTracker:
@@ -41,7 +38,7 @@ class RewardTracker:
 class Trainer(object):
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.env = gym.make('AtlantisNoFrameskip-v4')
+        self.env = gym.make('PongNoFrameskip-v4')
         self.env = wrap_dqn(self.env)
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
@@ -50,9 +47,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = HYPERPARAMS['batch_size']
-
-        csv_file = open('vanilla_dqn.csv', 'w+')
-        self.writer = csv.writer(csv_file)
+        self.tb_writer = SummaryWriter('results_pong')
 
 
     def preprocess(self, state):
@@ -76,42 +71,29 @@ class Trainer(object):
 
 
     def train(self):
-        start = datetime.datetime.now()
-        while True:
-            game_over = self.addExperience()
-            if game_over:
-                self.reward_tracker.add(self.score)
-                print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
-                self.score = 0
+        total_steps = 0
+        for episode in range(NUM_EPISODES):
+            for iteration in range(1e8)
+                total_steps += 1
+                game_over = self.addExperience()
 
-            # are we done prefetching?
-            if len(self.policy_net.memory) < HYPERPARAMS['replay_initial']:
-                continue
+                # are we done prefetching?
+                if len(self.policy_net.memory) < HYPERPARAMS['replay_initial']:
+                    continue
 
-            self.policy_net.optimizeModel(self.target_net)
-            time_delta = (datetime.datetime.now() - start).total_seconds()
-            self.writer.writerow([self.episode, self.score, self.reward_tracker.meanScore(), self.policy_net.epsilon_tracker._epsilon, time_delta])
-            if self.episode >= HYPERPARAMS['episodes']:
-                return
+                if game_over:
+                    self.reward_tracker.add(self.score)
+                    self.tb_writer.add_scalar('Score', self.score, episode)
+                    self.tb_writer.add_scalar('Average Score', self.reward_tracker.meanScore(), episode)
+                    self.tb_writer.add_scalar('Steps per episode', iteration, episode)
+                    print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                    self.score = 0
 
 
+                self.policy_net.optimizeModel(self.target_net)
 
-    # def playback(self, path):
-    #     target_net = torch.load(path, map_location='cpu')
-    #     env = gym.make('PongNoFrameskip-v4')
-    #     env = wrap_dqn(env)
-    #     state = self.preprocess(env.reset())
-    #     done = False
-    #     score = 0
-    #     import time
-    #     while not done:
-    #         time.sleep(0.015)
-    #         env.render(mode='human')
-    #         action = torch.argmax(target_net(state), dim=1).to(self.device)
-    #         state, reward, done, _ = env.step(action.item())
-    #         state = self.preprocess(state)
-    #         score += reward
-    #     print("Score: ", score)
+                if total_steps % 5 == 0:
+                    self.target_net.load_state_dict(self.policy_net.state_dict())
 
 
 
@@ -133,9 +115,4 @@ if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
     trainer.train()
-
-
-
-
-
 
