@@ -73,7 +73,7 @@ class Trainer(object):
     def train(self):
         total_steps = 0
         for episode in range(NUM_EPISODES):
-            for iteration in range(1e8)
+            for iteration in range(1e8):
                 total_steps += 1
                 game_over = self.addExperience()
 
