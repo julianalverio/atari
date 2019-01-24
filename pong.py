@@ -18,7 +18,7 @@ import torch.optim as optim
 
 # from lib import dqn_model, common
 # from other import actions, agent, experience
-import other
+from wrappers import wrap_dqn
 import csv
 import torch.nn as nn
 import collections
@@ -130,7 +130,7 @@ class Trainer(object):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.env = gym.make('PongNoFrameskip-v4')
-        self.env = other.common.wrappers.wrap_dqn(self.env)
+        self.env = wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
@@ -221,7 +221,7 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('PongNoFrameskip-v4')
-        env = other.common.wrappers.wrap_dqn(env)
+        env = wrap_dqn(env)
         state = self.preprocess(env.reset())
         done = False
         score = 0
