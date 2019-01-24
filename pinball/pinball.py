@@ -81,6 +81,10 @@ class Trainer(object):
                 # are we done prefetching?
                 if len(self.policy_net.memory) < HYPERPARAMS['replay_initial']:
                     continue
+                if len(self.policy_net.memory) == HYPERPARAMS['replay_initial']:
+                    self.score = 0
+                    self.state = self.preprocess(self.env.reset())
+                    break
 
                 if game_over:
                     self.reward_tracker.add(self.score)
