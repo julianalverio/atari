@@ -206,7 +206,7 @@ class Trainer(object):
                     print('Model Saved!')
                 if self.reward_tracker.meanScore() > 20:
                     print('Challenge Won in %s Episodes' % self.episode)
-                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
+                    # torch.save(self.target_net, 'pong_%s.pth' % self.episode)
                     print('Model Saved!')
                 self.score = 0
 
@@ -240,8 +240,8 @@ class Trainer(object):
 if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
-    # trainer.train()
-    trainer.playback('pong_900.pth')
+    trainer.train()
+    # trainer.playback('pong_900.pth')
 
 
 
