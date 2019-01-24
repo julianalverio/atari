@@ -41,14 +41,14 @@ class Trainer(object):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.env = gym.make('PongNoFrameskip-v4')
         self.env = wrap_dqn(self.env)
-        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
+        self.policy_net = Dueling_DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.reward_tracker = RewardTracker()
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = HYPERPARAMS['batch_size']
-        self.tb_writer = SummaryWriter('results_pong')
+        self.tb_writer = SummaryWriter('results_pong_dueling')
 
 
     def preprocess(self, state):
