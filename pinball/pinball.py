@@ -94,11 +94,7 @@ class Trainer(object):
                     print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                     self.score = 0
 
-
                 self.policy_net.optimizeModel(self.target_net)
-
-                if total_steps % 5 == 0:
-                    self.target_net.load_state_dict(self.policy_net.state_dict())
 
 
 
