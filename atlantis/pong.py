@@ -14,7 +14,7 @@ import argparse
 import torch
 import torch.optim as optim
 
-# from tensorboardX import SummaryWriter
+from tensorboardX import SummaryWriter
 
 # from lib import dqn_model, common
 # from other import actions, agent, experience
@@ -32,6 +32,10 @@ import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 # Some scores for comparison right here:
 # https://github.com/chainer/chainerrl/tree/master/examples/atari/dqn
+
+# Random: 12850
+# Human score: 29028.0
+# DQN Score 85641.0
 
 HYPERPARAMS = {
         'replay_size':      100000,
@@ -132,7 +136,7 @@ class Trainer(object):
     def __init__(self):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.env = gym.make('PongNoFrameskip-v4')
+        self.env = gym.make('AtlantisNoFrameskip-v4')
         self.env = wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
@@ -146,6 +150,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
+        self.tb_writer = SummaryWriter('results')
 
 
     def preprocess(self, state):
@@ -195,7 +200,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
-        while True:
+        for episode in range(100000):
             frame_idx += 1
             # play one move
             game_over = self.addExperience()
@@ -203,14 +208,9 @@ class Trainer(object):
             # is this round over?
             if game_over:
                 self.reward_tracker.add(self.score)
+                self.tb_writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), episode)
+                self.tb_writer.add_scalar('Score', self.score, episode)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
-                if (self.episode % 100 == 0):
-                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
-                    print('Model Saved!')
-                if self.reward_tracker.meanScore() > 20:
-                    print('Challenge Won in %s Episodes' % self.episode)
-                    # torch.save(self.target_net, 'pong_%s.pth' % self.episode)
-                    print('Model Saved!')
                 self.score = 0
 
             # are we done prefetching?
