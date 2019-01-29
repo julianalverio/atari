@@ -137,6 +137,7 @@ class Trainer(object):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.env = gym.make('AtlantisNoFrameskip-v4')
+        import pdb; pdb.set_trace()
         self.env = wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
@@ -199,7 +200,6 @@ class Trainer(object):
 
 
     def train(self):
-        import pdb; pdb.set_trace()
         frame_idx = 0
         for episode in range(100000):
             frame_idx += 1
