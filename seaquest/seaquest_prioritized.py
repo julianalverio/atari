@@ -221,7 +221,7 @@ class Trainer(object):
 
     def optimizeModel(self):
         tree_idx, transitions, ISWeights = self.memory.sample()
-        ISWeights = torch.tensor(ISWeights, device=self.device)
+        # ISWeights = torch.tensor(ISWeights, device=self.device)
         # check on this
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
