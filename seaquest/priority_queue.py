@@ -104,11 +104,8 @@ class Memory(object):  # stored as ( s, a, r, s_ ) in SumTree
         return batch_idx, minibatch, batch_ISWeights
 
     def batch_update(self, tree_idx, abs_errors):
-        # TODO: do something with abs here
-        import pdb; pdb.set_trace()
         abs_errors += self.small_delta
         clipped_errors = np.minimum(abs_errors, self.absolute_error_upper)
         ps = np.power(clipped_errors, self.alpha)
-
         for ti, p in zip(tree_idx, ps):
             self.tree.update(ti, p)
