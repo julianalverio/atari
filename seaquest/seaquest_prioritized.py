@@ -152,6 +152,9 @@ class EpsilonTracker:
         old_epsilon = self._epsilon
         self._epsilon -= self.epsilon_delta
         return max(old_epsilon, self.epsilon_final)
+    @property
+    def currentEpsilon(self):
+        return max(self._epsilon, self.epsilon_final)
 
 
 # class ReplayMemory(object):
@@ -255,6 +258,7 @@ class Trainer(object):
                 self.reward_tracker.add(self.score)
                 self.tb_writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), episode)
                 self.tb_writer.add_scalar('Score', self.score, episode)
+                self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 self.score = 0
 
