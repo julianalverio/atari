@@ -163,10 +163,11 @@ class Trainer(object):
 
 
     def addExperience(self):
-        if random.random() < self.epsilon_tracker.epsilon():
-            action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
-        else:
-            action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
+        action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
+        # if random.random() < self.epsilon_tracker.epsilon():
+        #     action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
+        # else:
+        #     action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
@@ -204,7 +205,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
-        for episode in range(1000000):
+        for episode in range(100000):
             frame_idx += 1
             # play one move
             game_over = self.addExperience()
@@ -220,10 +221,10 @@ class Trainer(object):
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
                 continue
-            self.optimizeModel()
-            if frame_idx % self.params['target_net_sync'] == 0:
-                self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.policy_net, 'final.pth')
+            # self.optimizeModel()
+            # if frame_idx % self.params['target_net_sync'] == 0:
+            #     self.target_net.load_state_dict(self.policy_net.state_dict())
+        # torch.save(self.policy_net, 'final.pth')
 
 
     def playback(self, path):
