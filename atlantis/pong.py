@@ -37,6 +37,9 @@ import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 # Human score: 29028.0
 # DQN Score 85641.0
 
+# use this to implement prioritization: https://github.com/higgsfield/RL-Adventure/blob/master/4.prioritized%20dqn.ipynb
+
+
 HYPERPARAMS = {
         'replay_size':      10000,
         'replay_initial':   10000,
@@ -154,6 +157,7 @@ class Trainer(object):
 
 
     def preprocess(self, state):
+        self.env.render(mode='human')
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         return state.float() / 256
 
@@ -164,7 +168,6 @@ class Trainer(object):
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
-        import pdb; pdb.set_trace()
         next_state = self.preprocess(next_state)
         self.score += reward
         if done:
@@ -201,7 +204,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
-        for episode in range(100000):
+        for episode in range(1000000):
             frame_idx += 1
             # play one move
             game_over = self.addExperience()
