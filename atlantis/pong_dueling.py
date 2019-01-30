@@ -180,7 +180,7 @@ class Trainer(object):
         self.env = gym.make('Seaquest-v0')
         self.env = wrap_dqn(self.env)
 
-        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
+        self.policy_net = Dueling_DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
@@ -191,7 +191,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
-        self.tb_writer = SummaryWriter('results')
+        self.tb_writer = SummaryWriter('results_dueling')
 
 
     def preprocess(self, state):
