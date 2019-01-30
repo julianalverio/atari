@@ -95,18 +95,20 @@ class Dueling_DQN(nn.Module):
             nn.Conv2d(64, 64, kernel_size=3, stride=1),
             nn.ReLU()
         )
+        conv_out = self.conv(Variable(torch.zeros(1, *input_shape)))
+        conv_out_size = int(np.prod(conv_out.size()))
 
 
         self.fc_adv = nn.Sequential(
-            nn.Linear(in_features=7 * 7 * 64, out_features=512),
+            nn.Linear(in_features=conv_out_size, out_features=512),
             nn.ReLU(),
             nn.Linear(in_features=512, out_features=num_actions)
         )
 
         self.fc_val = nn.Sequential(
-            nn.Linear(in_features=7 * 7 * 64, out_features=512),
+            nn.Linear(in_features=conv_out_size, out_features=512),
             nn.ReLU(),
-            nn.Linear(in_features=7 * 7 * 64, out_features=1)
+            nn.Linear(in_features=512, out_features=1)
         )
 
 
@@ -203,6 +205,7 @@ class Trainer(object):
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
         else:
+            import pdb; pdb.set_trace()
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
