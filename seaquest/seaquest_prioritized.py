@@ -291,6 +291,7 @@ def cleanup():
 
 if __name__ == "__main__":
     cleanup()
+    print('Creating Trainer Object')
     trainer = Trainer()
     print('Trainer Initialized')
     trainer.train()
