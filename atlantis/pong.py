@@ -136,7 +136,7 @@ class Trainer(object):
     def __init__(self):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.env = gym.make('SeaquestNoFrameskip-v0')
+        self.env = gym.make('Seaquest-v0')
         self.env = wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
