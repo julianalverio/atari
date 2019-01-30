@@ -77,7 +77,6 @@ class DQN(nn.Module):
             nn.Linear(512, num_actions)
         )
 
-
     def forward(self, x):
         x = self.conv(x).view(x.size()[0], -1)
         return self.fc(x)
@@ -96,20 +95,21 @@ class Dueling_DQN(nn.Module):
             nn.Conv2d(64, 64, kernel_size=3, stride=1),
             nn.ReLU()
         )
+        conv_out = self.conv(Variable(torch.zeros(1, *input_shape)))
+        conv_out_size = int(np.prod(conv_out.size()))
 
 
         self.fc_adv = nn.Sequential(
-            nn.Linear(in_features=7 * 7 * 64, out_features=512),
+            nn.Linear(in_features=conv_out_size, out_features=512),
             nn.ReLU(),
             nn.Linear(in_features=512, out_features=num_actions)
         )
 
         self.fc_val = nn.Sequential(
-            nn.Linear(in_features=7 * 7 * 64, out_features=512),
+            nn.Linear(in_features=conv_out_size, out_features=512),
             nn.ReLU(),
-            nn.Linear(in_features=7 * 7 * 64, out_features=1)
+            nn.Linear(in_features=512, out_features=1)
         )
-
 
     def forward(self, x):
         x = self.conv(x)
