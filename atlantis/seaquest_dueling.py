@@ -205,7 +205,6 @@ class Trainer(object):
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
         else:
-            import pdb; pdb.set_trace()
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
