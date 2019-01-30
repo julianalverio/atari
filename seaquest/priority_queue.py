@@ -101,7 +101,7 @@ class Memory(object):  # stored as ( s, a, r, s_ ) in SumTree
             # check on this
             minibatch.append(experience)
 
-        return batch_idx, minibatch, torch.tensor(batch_ISWeights).cuda()
+        return batch_idx, minibatch, batch_ISWeights
 
     def batch_update(self, tree_idx, abs_errors):
         # TODO: do something with abs here
