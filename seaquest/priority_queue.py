@@ -16,8 +16,9 @@ class SumTree(object):
         self.data[self.data_pointer] = data
         self.update(tree_index, priority)
         self.data_pointer = (self.data_pointer + 1) % self.capacity
-        if self.data_pointer == 0:
+        if self.data_pointer == 0 and not self.done_prefetching:
             self.done_prefetching = True
+            print('Done pre-fetching.')
 
     def update(self, tree_index, priority):
         change = priority - self.tree[tree_index]
@@ -97,7 +98,6 @@ class Memory(object):  # stored as ( s, a, r, s_ ) in SumTree
             batch_ISWeights[i, 0] = np.power(self.batch_size * sampling_probabilities, -self.beta) / max_weight
 
             batch_idx[i] = index
-            import pdb; pdb.set_trace()
             # check on this
             minibatch.append(experience)
 
@@ -111,6 +111,3 @@ class Memory(object):  # stored as ( s, a, r, s_ ) in SumTree
 
         for ti, p in zip(tree_idx, ps):
             self.tree.update(ti, p)
-
-    def __len__(self):
-        return self.tree.data
