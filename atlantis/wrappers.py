@@ -225,7 +225,7 @@ class ImageToPyTorch(gym.ObservationWrapper):
 
 def wrap_dqn(env, stack_frames=4, episodic_life=True, reward_clipping=True):
     """Apply a common set of wrappers for Atari games."""
-    assert 'NoFrameskip' in env.spec.id
+    # assert 'NoFrameskip' in env.spec.id
     if episodic_life:
         env = EpisodicLifeEnv(env)
     env = NoopResetEnv(env, noop_max=30)
