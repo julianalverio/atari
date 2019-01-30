@@ -157,7 +157,6 @@ class Trainer(object):
 
 
     def preprocess(self, state):
-        self.env.render(mode='human')
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         return state.float() / 256
 
@@ -237,7 +236,6 @@ class Trainer(object):
         import time
         while not done:
             time.sleep(0.015)
-            env.render(mode='human')
             action = torch.argmax(target_net(state), dim=1).to(self.device)
             state, reward, done, _ = env.step(action.item())
             state = self.preprocess(state)
