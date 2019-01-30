@@ -195,7 +195,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
-        self.tb_writer = SummaryWriter('results_normal')
+        self.tb_writer = SummaryWriter('results')
 
 
     def preprocess(self, state):

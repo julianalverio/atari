@@ -196,7 +196,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
-        self.tb_writer = SummaryWriter('results_prioritized')
+        self.tb_writer = SummaryWriter('results')
 
 
     def preprocess(self, state):
@@ -288,8 +288,8 @@ class Trainer(object):
         print("Score: ", score)
 
 def cleanup():
-    if os.path.isdir('results_prioritized'):
-        shutil.rmtree('results_prioritized')
+    if os.path.isdir('results'):
+        shutil.rmtree('results')
     csv_txt_files = [x for x in os.listdir('.') if '.TXT' in x or '.csv' in x]
     for csv_txt_file in csv_txt_files:
         os.remove(csv_txt_file)
