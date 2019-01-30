@@ -202,7 +202,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
-        for episode in range(1e6):
+        for episode in range(int(1e6)):
             frame_idx += 1
             # play one move
             game_over = self.addExperience()
