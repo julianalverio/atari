@@ -7,6 +7,7 @@ import random
 random.seed(5)
 import numpy as np
 np.random.seed(5)
+import shutil
 
 import gym
 import argparse
@@ -162,11 +163,10 @@ class Trainer(object):
 
 
     def addExperience(self):
-        action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
-        # if random.random() < self.epsilon_tracker.epsilon():
-        #     action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
-        # else:
-        #     action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
+        if random.random() < self.epsilon_tracker.epsilon():
+            action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
+        else:
+            action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
@@ -200,8 +200,6 @@ class Trainer(object):
         self.optimizer.step()
 
 
-
-
     def train(self):
         frame_idx = 0
         for episode in range(100000):
@@ -220,10 +218,10 @@ class Trainer(object):
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
                 continue
-            # self.optimizeModel()
-            # if frame_idx % self.params['target_net_sync'] == 0:
-            #     self.target_net.load_state_dict(self.policy_net.state_dict())
-        # torch.save(self.policy_net, 'final.pth')
+            self.optimizeModel()
+            if frame_idx % self.params['target_net_sync'] == 0:
+                self.target_net.load_state_dict(self.policy_net.state_dict())
+        torch.save(self.policy_net, 'final.pth')
 
 
     def playback(self, path):
@@ -242,9 +240,16 @@ class Trainer(object):
             score += reward
         print("Score: ", score)
 
+def cleanup():
+    if os.path.isdir('results'):
+        shutil.rmtree('results')
+    csv_txt_files = [x for x in os.listdir('.') if '.TXT' in x or '.csv' in x]
+    for csv_txt_file in csv_txt_files:
+        os.remove(csv_txt_file)
 
 
 if __name__ == "__main__":
+    cleanup()
     trainer = Trainer()
     print('Trainer Initialized')
     trainer.train()
