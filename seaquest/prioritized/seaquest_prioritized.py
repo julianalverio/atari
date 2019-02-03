@@ -225,6 +225,7 @@ class Trainer(object):
 
     def optimizeModel(self):
         transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
+        import pdb; pdb.set_trace()
         ISWeights = torch.tensor(ISWeights, device=self.device)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
@@ -238,7 +239,7 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         import pdb; pdb.set_trace()
-        loss = torch.sum((abs_errors ** 2) * ISWeights)
+        loss = torch.sum((abs_errors ** 2) * torch.FloatTensor(ISWeights))
         # loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
         self.memory.update_priorities(tree_idx, abs_errors.detach().cpu().numpy() + 1e-6)
         self.optimizer.zero_grad()
