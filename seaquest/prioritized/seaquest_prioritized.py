@@ -239,7 +239,7 @@ class Trainer(object):
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum((abs_errors ** 2) * ISWeights)
         # loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
-        self.memory.batch_update(tree_idx, abs_errors.detach().cpu().numpy() + 1e-6)
+        self.memory.update_priorities(tree_idx, abs_errors.detach().cpu().numpy() + 1e-6)
         self.optimizer.zero_grad()
         loss.backward()
         # for param in self.policy_net.parameters():
