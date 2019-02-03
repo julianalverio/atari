@@ -98,7 +98,7 @@ class PrioritizedReplayBuffer(ReplayBuffer):
         self._it_min = MinSegmentTree(it_capacity)
         self._max_priority = 1.0
 
-    def add(self, *args, **kwargs):
+    def push(self, *args, **kwargs):
         """See ReplayBuffer.store_effect"""
         idx = self._next_idx
         super().add(*args, **kwargs)
