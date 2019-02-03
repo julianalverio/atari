@@ -118,7 +118,7 @@ class SumSegmentTree(SegmentTree):
             else:
                 prefixsum -= self._value[2 * idx]
                 idx = 2 * idx + 1
-        return idx - self._capacityp
+        return idx - self._capacity
 
 
 class MinSegmentTree(SegmentTree):
