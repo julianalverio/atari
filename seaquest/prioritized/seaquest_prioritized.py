@@ -193,7 +193,7 @@ class Trainer(object):
         self.reward_tracker = RewardTracker()
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
         # self.memory = ReplayMemory(self.params['replay_size'], self.transition)
-        self.memory = Memory(self.params['replay_size', self.transition])
+        self.memory = Memory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
