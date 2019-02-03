@@ -29,8 +29,10 @@ from torch.autograd import Variable
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-from priority_queue import Memory
-
+# from priority_queue import Memory
+import sys
+sys.path.insert('..')
+from prioritized_buffer import PrioritizedReplayBuffer as Memory
 
 # Some scores for comparison right here:
 # https://github.com/chainer/chainerrl/tree/master/examples/atari/dqn
@@ -189,9 +191,9 @@ class Trainer(object):
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
-        self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
+        self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
         # self.memory = ReplayMemory(self.params['replay_size'], self.transition)
-        self.memory = Memory(self.params['replay_size'])
+        self.memory = Memory(self.params['replay_size', self.transition])
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
@@ -212,20 +214,18 @@ class Trainer(object):
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
+        self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
         if done:
-            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.env.reset())
             self.episode += 1
         else:
-            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
             self.state = next_state
         return done
 
 
     def optimizeModel(self):
-        tree_idx, transitions, ISWeights = self.memory.sample()
+        transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
         ISWeights = torch.tensor(ISWeights, device=self.device)
-        # check on this
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
@@ -239,7 +239,7 @@ class Trainer(object):
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum((abs_errors ** 2) * ISWeights)
         # loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
-        self.memory.batch_update(tree_idx, abs_errors.detach().cpu().numpy())
+        self.memory.batch_update(tree_idx, abs_errors.detach().cpu().numpy() + 1e-6)
         self.optimizer.zero_grad()
         loss.backward()
         # for param in self.policy_net.parameters():
