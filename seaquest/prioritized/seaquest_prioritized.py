@@ -263,7 +263,7 @@ class Trainer(object):
                 self.score = 0
 
             # are we done prefetching?
-            if not self.memory.tree.done_prefetching:
+            if not self.memory.donePrefetching():
                 continue
             self.optimizeModel()
             if frame_idx % self.params['target_net_sync'] == 0:
