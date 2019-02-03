@@ -31,7 +31,7 @@ from torch.autograd import Variable
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 # from priority_queue import Memory
 import sys
-sys.path.insert('..')
+sys.path.insert(0, '..')
 from prioritized_buffer import PrioritizedReplayBuffer as Memory
 
 # Some scores for comparison right here:
