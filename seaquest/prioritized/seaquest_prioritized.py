@@ -81,7 +81,11 @@ class DQN(nn.Module):
 
 
     def forward(self, x):
+        if torch.isnan(x).any().item() == 1:
+            import pdb; pdb.set_trace()
         x = self.conv(x).view(x.size()[0], -1)
+        if torch.isnan(x).any().item() == 1:
+            import pdb; pdb.set_trace()
         return self.fc(x)
 
 
@@ -192,7 +196,6 @@ class Trainer(object):
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
-        # self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.memory = Memory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
@@ -245,8 +248,8 @@ class Trainer(object):
             import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
         loss.backward()
-        # for param in self.policy_net.parameters():
-        #     param.grad.data.clamp_(-1, 1)
+        for param in self.policy_net.parameters():
+            param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
     def train(self):
