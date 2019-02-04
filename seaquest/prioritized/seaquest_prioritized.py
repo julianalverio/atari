@@ -238,8 +238,8 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
-        # loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
-        self.memory.update_priorities(tree_idx, abs_errors.detach().cpu().numpy() + 1e-6)
+        abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
+        self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
         self.optimizer.zero_grad()
         loss.backward()
         # for param in self.policy_net.parameters():
