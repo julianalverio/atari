@@ -239,7 +239,10 @@ class Trainer(object):
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
         abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
-        self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
+        try:
+            self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
+        except:
+            import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
         loss.backward()
         # for param in self.policy_net.parameters():

@@ -181,10 +181,7 @@ class PrioritizedReplayBuffer(ReplayBuffer):
         """
         assert len(idxes) == len(priorities)
         for idx, priority in zip(idxes, priorities):
-            try:
-                assert priority > 0
-            except:
-                import pdb; pdb.set_trace()
+            assert priority > 0
             assert 0 <= idx < len(self._storage)
             self._it_sum[idx] = priority ** self._alpha
             self._it_min[idx] = priority ** self._alpha
