@@ -260,19 +260,17 @@ class Trainer(object):
         # batch = self.transition(*zip(*transitions))
         # non_final_mask = torch.tensor(dones, device=self.device, dtype=torch.uint8)
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
-        print(non_final_mask.shape)
-        import pdb; pdb.set_trace()
         non_final_next_states = torch.cat([torch.tensor(next_states[idx], device=self.device ) for idx, done in enumerate(dones) if not done])
         # state_batch = torch.cat(list(batch.state))
         # action_batch = torch.cat(list(batch.action))
         # reward_batch = torch.cat(list(batch.reward))
         state_action_values = self.policy_net(states).gather(1, actions)
         next_state_values = torch.zeros(self.batch_size, device=self.device)
-        import pdb; pdb.set_trace()
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.params['gamma']) + rewards
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
+        import pdb; pdb.set_trace()
         abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
         try:
             self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
