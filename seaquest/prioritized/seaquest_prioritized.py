@@ -247,6 +247,7 @@ class Trainer(object):
 
     def optimizeModel(self):
         beta = self.beta_scheduler.updateAndGetValue()
+        print(beta)
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         dones = dones.astype(np.uint8)
         states = torch.tensor(states, device=self.device).squeeze(1)
