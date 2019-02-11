@@ -254,6 +254,7 @@ class Trainer(object):
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         states = torch.tensor(states, device=self.device).squeeze(1)
         actions = torch.tensor(actions, device=self.device)
+        rewards = torch.tensor(rewards, device=self.device)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
         for state_iter in next_states:
