@@ -82,11 +82,7 @@ class DQN(nn.Module):
 
 
     def forward(self, x):
-        if torch.isnan(x).any().item() == 1:
-            import pdb; pdb.set_trace()
         x = self.conv(x).view(x.size()[0], -1)
-        if torch.isnan(x).any().item() == 1:
-            import pdb; pdb.set_trace()
         return self.fc(x)
 
 
