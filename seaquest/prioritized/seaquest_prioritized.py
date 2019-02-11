@@ -257,23 +257,14 @@ class Trainer(object):
         rewards = torch.tensor(rewards, device=self.device)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
-        for state_iter in next_states:
-            if state_iter is not None:
-                try:
-                    torch.tensor(state_iter, device=self.device)
-                except:
-                    print('here')
-                    import pdb; pdb.set_trace()
-                    pass
-
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([torch.tensor(s, device=self.device) for s in next_states if s is not None])
+        non_final_mask = torch.tensor(dones, device=self.device, dtype=torch.uint8)
+        non_final_next_states = torch.cat([torch.tensor(next_states[idx]) for idx, done in enumerate(dones) if not done], device=self.device)
         # state_batch = torch.cat(list(batch.state))
         # action_batch = torch.cat(list(batch.action))
         # reward_batch = torch.cat(list(batch.reward))
         state_action_values = self.policy_net(states).gather(1, actions)
-        import pdb; pdb.set_trace()
         next_state_values = torch.zeros(self.batch_size, device=self.device)
+        import pdb; pdb.set_trace()
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.params['gamma']) + rewards
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
