@@ -256,7 +256,6 @@ class Trainer(object):
         states = torch.tensor(states, device=self.device).squeeze(1)
         actions = torch.tensor(actions, device=self.device)
         rewards = torch.tensor(rewards, device=self.device)
-        import pdb; pdb.set_trace()
         ISWeights = torch.FloatTensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
         # non_final_mask = torch.tensor(dones, device=self.device, dtype=torch.uint8)
