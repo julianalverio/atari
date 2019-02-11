@@ -261,7 +261,6 @@ class Trainer(object):
         import pdb; pdb.set_trace()
         # non_final_mask = torch.tensor(dones, device=self.device, dtype=torch.uint8)
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
-        print(non_final_mask.shape())
         import pdb; pdb.set_trace()
         non_final_next_states = torch.cat([torch.tensor(next_states[idx], device=self.device ) for idx, done in enumerate(dones) if not done])
         # state_batch = torch.cat(list(batch.state))
