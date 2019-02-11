@@ -271,24 +271,26 @@ class Trainer(object):
     def train(self):
         self.prefetch()
         frame_idx = 0
-        for episode in range(int(1e7)):
-            frame_idx += 1
-            # play one move
-            game_over = self.addExperience()
+        for episode in range(3000):
+            while 1:
+                frame_idx += 1
+                # play one move
+                game_over = self.addExperience()
 
-            self.optimizeModel()
-            if frame_idx % self.params['target_net_sync'] == 0:
-                self.target_net.load_state_dict(self.policy_net.state_dict())
+                self.optimizeModel()
+                if frame_idx % self.params['target_net_sync'] == 0:
+                    self.target_net.load_state_dict(self.policy_net.state_dict())
 
-            # is this round over?
-            if game_over:
-                self.reward_tracker.add(self.score)
-                self.tb_writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), episode)
-                self.tb_writer.add_scalar('Score', self.score, episode)
-                self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
-                self.tb_writer.add_scalar('Beta', self.beta_scheduler.observeValue(), episode)
-                print('Game: %s Score: %s Mean Score: %s' % (episode, self.score, self.reward_tracker.meanScore()))
-                self.score = 0
+                # is this round over?
+                if game_over:
+                    self.reward_tracker.add(self.score)
+                    self.tb_writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), episode)
+                    self.tb_writer.add_scalar('Score', self.score, episode)
+                    self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
+                    self.tb_writer.add_scalar('Beta', self.beta_scheduler.observeValue(), episode)
+                    print('Game: %s Score: %s Mean Score: %s' % (episode, self.score, self.reward_tracker.meanScore()))
+                    self.score = 0
+                    break
 
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
