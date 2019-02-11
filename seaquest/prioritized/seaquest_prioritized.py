@@ -196,7 +196,7 @@ class Trainer(object):
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
-        self.memory = Memory(self.params['replay_size'], self.transition)
+        self.memory = Memory(self.params['replay_size'])
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
@@ -228,6 +228,7 @@ class Trainer(object):
 
     def optimizeModel(self):
         transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
+        import pdb; pdb.set_trace()
         ISWeights = torch.tensor(ISWeights, device=self.device)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
@@ -252,12 +253,23 @@ class Trainer(object):
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
+    def prefetch(self):
+        while len(self.memory) < self.params['replay_size']:
+            self.addExperience()
+        self.score = 0
+        print('Done Prefetching.')
+
     def train(self):
+        self.prefetch()
         frame_idx = 0
         for episode in range(int(1e7)):
             frame_idx += 1
             # play one move
             game_over = self.addExperience()
+
+            self.optimizeModel()
+            if frame_idx % self.params['target_net_sync'] == 0:
+                self.target_net.load_state_dict(self.policy_net.state_dict())
 
             # is this round over?
             if game_over:
@@ -267,15 +279,6 @@ class Trainer(object):
                 self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 self.score = 0
-
-            # are we done prefetching?
-            if not self.memory.donePrefetching():
-                continue
-            self.optimizeModel()
-            if frame_idx % self.params['target_net_sync'] == 0:
-                self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.policy_net, 'final.pth')
-
 
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
@@ -292,6 +295,7 @@ class Trainer(object):
             state = self.preprocess(state)
             score += reward
         print("Score: ", score)
+
 
 def cleanup():
     if os.path.isdir('results'):
