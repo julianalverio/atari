@@ -239,11 +239,12 @@ class Trainer(object):
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
-        self.memory.add(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
         if done:
+            self.memory.add(self.state, action, torch.tensor([reward], device=self.device), None, done)
             self.state = self.preprocess(self.env.reset())
             self.episode += 1
         else:
+            self.memory.add(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
             self.state = next_state
         return done
 
@@ -253,8 +254,8 @@ class Trainer(object):
         import pdb; pdb.set_trace()
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         ISWeights = torch.tensor(ISWeights, device=self.device)
-        batch = self.transition(*zip(*transitions))
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
+        # batch = self.transition(*zip(*transitions))
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
         state_batch = torch.cat(list(batch.state))
         action_batch = torch.cat(list(batch.action))
