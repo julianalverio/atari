@@ -46,8 +46,8 @@ from queues import PrioritizedReplayBuffer as Memory
 
 
 HYPERPARAMS = {
-        'replay_size':      10000,
-        'replay_initial':   10000,
+        'replay_size':      100,  # 10K
+        'replay_initial':   100,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
         'epsilon_start':    1.0,
@@ -183,6 +183,26 @@ class EpsilonTracker:
 #     def __len__(self):
 #         return len(self.memory)
 
+class LinearScheduler(object):
+    def __init__(self, start, stop, delta=None, timespan=None):
+        assert delta or timespan
+        self.value = start
+        self.stop = stop
+        if delta:
+            self.delta = float(delta)
+        elif timespan:
+            self.delta = (stop - start) / float(timespan)
+
+    def updateAndGetValue(self):
+        self.value += self.delta
+        return self.observeValue()
+
+    def observeValue(self):
+        if self.delta > 0:
+            return min(self.value, self.stop)
+        else:
+            return max(self.value, self.stop)
+
 
 class Trainer(object):
     def __init__(self):
@@ -197,7 +217,8 @@ class Trainer(object):
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
-        self.memory = Memory(self.params['replay_size'])
+        self.memory = Memory(self.params['replay_size'], 0.6)
+        self.beta_scheduler = LinearScheduler(0.4, 1.0, timespan=self.params['epsilon_frames'])
         self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
@@ -218,7 +239,7 @@ class Trainer(object):
         next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
-        self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
+        self.memory.add(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
         if done:
             self.state = self.preprocess(self.env.reset())
             self.episode += 1
@@ -228,8 +249,8 @@ class Trainer(object):
 
 
     def optimizeModel(self):
-        transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
         import pdb; pdb.set_trace()
+        transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
