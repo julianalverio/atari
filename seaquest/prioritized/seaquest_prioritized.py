@@ -259,7 +259,7 @@ class Trainer(object):
         for state_iter in next_states:
             if state_iter is not None:
                 try:
-                    torch.tensor(s, device=self.device)
+                    torch.tensor(state_iter, device=self.device)
                 except:
                     print('here')
                     import pdb; pdb.set_trace()
