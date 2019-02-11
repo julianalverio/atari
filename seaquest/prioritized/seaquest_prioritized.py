@@ -256,8 +256,8 @@ class Trainer(object):
         actions = torch.tensor(actions, device=self.device)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
-        for s in next_states:
-            if s is not None:
+        for state_iter in next_states:
+            if state_iter is not None:
                 try:
                     torch.tensor(s, device=self.device)
                 except:
