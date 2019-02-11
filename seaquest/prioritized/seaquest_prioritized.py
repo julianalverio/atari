@@ -17,10 +17,7 @@ import torch.optim as optim
 
 from tensorboardX import SummaryWriter
 
-# from lib import dqn_model, common
-# from other import actions, agent, experience
 from wrappers import wrap_dqn
-import csv
 import torch.nn as nn
 import collections
 import copy
@@ -29,10 +26,8 @@ from torch.autograd import Variable
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-# from priority_queue import Memory
 import sys
 sys.path.insert(0, '..')
-# from prioritized_buffer import PrioritizedReplayBuffer as Memory
 from queues import PrioritizedReplayBuffer as Memory
 
 # Some scores for comparison right here:
@@ -247,7 +242,6 @@ class Trainer(object):
 
     def optimizeModel(self):
         beta = self.beta_scheduler.updateAndGetValue()
-        print(beta)
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         dones = dones.astype(np.uint8)
         states = torch.tensor(states, device=self.device).squeeze(1)
@@ -294,6 +288,7 @@ class Trainer(object):
                 self.tb_writer.add_scalar('Mean Score', self.reward_tracker.meanScore(), episode)
                 self.tb_writer.add_scalar('Score', self.score, episode)
                 self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
+                self.tb_writer.add_scalar('Beta', self.beta_scheduler.observeValue(), episode)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 self.score = 0
 
