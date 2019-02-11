@@ -41,8 +41,8 @@ from queues import PrioritizedReplayBuffer as Memory
 
 
 HYPERPARAMS = {
-        'replay_size':      100,  # 10K
-        'replay_initial':   100,
+        'replay_size':      100000,  # 10K
+        'replay_initial':   100000,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
         'epsilon_start':    1.0,
