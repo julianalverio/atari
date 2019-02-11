@@ -252,7 +252,6 @@ class Trainer(object):
     def optimizeModel(self):
         beta = self.beta_scheduler.updateAndGetValue()
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
-        import pdb; pdb.set_trace()
         dones = dones.astype(np.uint8)
         states = torch.tensor(states, device=self.device).squeeze(1)
         actions = torch.tensor(actions, device=self.device)
