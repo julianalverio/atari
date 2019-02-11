@@ -262,7 +262,7 @@ class Trainer(object):
         # action_batch = torch.cat(list(batch.action))
         # reward_batch = torch.cat(list(batch.reward))
         import pdb; pdb.set_trace()
-        state_action_values = self.policy_net(states).gather(1, actions.unsqueeze(1))
+        state_action_values = self.policy_net(states).gather(1, actions)
         next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.params['gamma']) + rewards
