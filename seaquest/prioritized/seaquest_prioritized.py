@@ -251,19 +251,22 @@ class Trainer(object):
 
     def optimizeModel(self):
         beta = self.beta_scheduler.updateAndGetValue()
-        import pdb; pdb.set_trace()
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
+        states = torch.tensor(states, device=self.device)
+        actions = torch.tensor(actions, device=self.device)
+        next_states = torch.tensor(next_states, device=self.device)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
-        state_batch = torch.cat(list(batch.state))
-        action_batch = torch.cat(list(batch.action))
-        reward_batch = torch.cat(list(batch.reward))
-        state_action_values = self.policy_net(state_batch).gather(1, action_batch.unsqueeze(1))
+        non_final_next_states = torch.cat([s for s in next_states if s is not None])
+        # state_batch = torch.cat(list(batch.state))
+        # action_batch = torch.cat(list(batch.action))
+        # reward_batch = torch.cat(list(batch.reward))
+        import pdb; pdb.set_trace()
+        state_action_values = self.policy_net(states).gather(1, actions.unsqueeze(1))
         next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
+        expected_state_action_values = (next_state_values * self.params['gamma']) + rewards
         abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
         loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
         abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
