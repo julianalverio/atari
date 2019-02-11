@@ -210,7 +210,6 @@ class Trainer(object):
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
         self.memory = Memory(self.params['replay_size'], 0.6)
         self.beta_scheduler = LinearScheduler(0.4, 1.0, timespan=self.params['epsilon_frames'])
-        self.episode = 0
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
@@ -233,7 +232,6 @@ class Trainer(object):
         if done:
             self.memory.add(self.state, action, torch.tensor([reward], device=self.device), None, done)
             self.state = self.preprocess(self.env.reset())
-            self.episode += 1
         else:
             self.memory.add(self.state, action, torch.tensor([reward], device=self.device), next_state, done)
             self.state = next_state
@@ -289,7 +287,7 @@ class Trainer(object):
                 self.tb_writer.add_scalar('Score', self.score, episode)
                 self.tb_writer.add_scalar('Epsilon', self.epsilon_tracker.currentEpsilon, episode)
                 self.tb_writer.add_scalar('Beta', self.beta_scheduler.observeValue(), episode)
-                print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                print('Game: %s Score: %s Mean Score: %s' % (episode, self.score, self.reward_tracker.meanScore()))
                 self.score = 0
 
     def playback(self, path):
