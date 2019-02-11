@@ -261,7 +261,10 @@ class Trainer(object):
                 try:
                     torch.tensor(s, device=self.device)
                 except:
+                    print('here')
                     import pdb; pdb.set_trace()
+                    pass
+
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([torch.tensor(s, device=self.device) for s in next_states if s is not None])
         # state_batch = torch.cat(list(batch.state))
