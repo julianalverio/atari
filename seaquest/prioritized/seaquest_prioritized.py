@@ -250,7 +250,8 @@ class Trainer(object):
 
     def optimizeModel(self):
         import pdb; pdb.set_trace()
-        transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size)
+        beta = self.beta_scheduler.updateAndGetValue()
+        transitions, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         ISWeights = torch.tensor(ISWeights, device=self.device)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
