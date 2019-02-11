@@ -259,7 +259,7 @@ class Trainer(object):
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(dones, device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([torch.tensor(next_states[idx]) for idx, done in enumerate(dones) if not done], device=self.device)
+        non_final_next_states = torch.cat([torch.tensor(next_states[idx], device=self.device) for idx, done in enumerate(dones) if not done])
         # state_batch = torch.cat(list(batch.state))
         # action_batch = torch.cat(list(batch.action))
         # reward_batch = torch.cat(list(batch.reward))
