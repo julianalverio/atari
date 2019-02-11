@@ -254,7 +254,7 @@ class Trainer(object):
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         states = torch.tensor(states, device=self.device)
         actions = torch.tensor(actions, device=self.device)
-        next_states = torch.tensor(next_states, device=self.device)
+        import pdb; pdb.set_trace()
         ISWeights = torch.tensor(ISWeights, device=self.device)
         # batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, next_states)), device=self.device, dtype=torch.uint8)
