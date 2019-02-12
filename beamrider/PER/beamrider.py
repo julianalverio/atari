@@ -274,7 +274,7 @@ class Trainer(object):
                 # play one move
                 game_over = self.addExperience()
 
-                self.optimizeModelPER()
+                self.optimizeModel()
                 if frame_idx % self.params['target_net_sync'] == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
 
