@@ -17,7 +17,6 @@ import torch.optim as optim
 
 from tensorboardX import SummaryWriter
 
-from wrappers import wrap_dqn
 import torch.nn as nn
 import collections
 import copy
@@ -30,6 +29,7 @@ import sys
 sys.path.insert(0, '..')
 sys.path.insert(0, '.')
 from queues import PrioritizedReplayBuffer as Memory
+from wrappers import wrap_dqn
 
 
 HYPERPARAMS = {
