@@ -197,8 +197,8 @@ class Trainer(object):
         self.env = wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
-        if torch.cuda.device_count() > 1:
-            self.policy_net = nn.DataParallel(self.policy_net)
+        # if torch.cuda.device_count() > 1:
+        #     self.policy_net = nn.DataParallel(self.policy_net)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
