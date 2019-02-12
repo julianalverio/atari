@@ -235,7 +235,7 @@ class Trainer(object):
         return done
 
 
-    def optimizeModel(self):
+    def optimizeModelPER(self):
         beta = self.beta_scheduler.updateAndGetValue()
         states, actions, rewards, next_states, dones, ISWeights, tree_idx = self.memory.sample(self.batch_size, beta=beta)
         dones = dones.astype(np.uint8)
@@ -253,6 +253,33 @@ class Trainer(object):
         loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
         abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
         self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
+        self.optimizer.zero_grad()
+        loss.backward()
+        for param in self.policy_net.parameters():
+            param.grad.data.clamp_(-1, 1)
+        self.optimizer.step()
+
+
+
+    def optimizeModel(self):
+        # beta = self.beta_scheduler.updateAndGetValue()
+        states, actions, rewards, next_states, dones = self.memory.sample(self.batch_size)
+        dones = dones.astype(np.uint8)
+        states = torch.tensor(states, device=self.device).squeeze(1)
+        actions = torch.tensor(actions, device=self.device)
+        rewards = torch.tensor(rewards, device=self.device)
+        # ISWeights = torch.tensor(ISWeights.astype(np.float32), device=self.device)
+        non_final_mask = 1 - torch.tensor(dones, device=self.device, dtype=torch.uint8)
+        non_final_next_states = torch.cat([torch.tensor(next_states[idx], device=self.device) for idx, done in enumerate(dones) if not done])
+        state_action_values = self.policy_net(states).gather(1, actions)
+        next_state_values = torch.zeros(self.batch_size, device=self.device)
+        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+        expected_state_action_values = (next_state_values * self.params['gamma']) + rewards
+        loss = nn.MSELoss()(expected_state_action_values, state_action_values)
+        # abs_errors = abs(expected_state_action_values.unsqueeze(1) - state_action_values)
+        # loss = torch.sum(abs_errors ** 2 * ISWeights) / self.batch_size
+        # abs_errors_clone = abs_errors.clone().detach().cpu().numpy()
+        # self.memory.update_priorities(tree_idx, abs_errors_clone + 1e-3)
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.policy_net.parameters():
