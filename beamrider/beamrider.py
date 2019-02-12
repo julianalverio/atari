@@ -29,7 +29,10 @@ import sys
 sys.path.insert(0, '..')
 sys.path.insert(0, '.')
 from queues import PrioritizedReplayBuffer as Memory
-from wrappers import wrap_dqn
+try:
+    from ..wrappers import wrap_dqn
+except:
+    from .wrappers import wrap_dqn
 
 
 HYPERPARAMS = {
