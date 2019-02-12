@@ -28,7 +28,7 @@ from torch.autograd import Variable
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import sys
 sys.path.insert(0, '..')
-from queues import PrioritizedReplayBuffer as Memory
+# from queues import PrioritizedReplayBuffer as Memory
 
 # Some scores for comparison right here:
 # https://github.com/chainer/chainerrl/tree/master/examples/atari/dqn
