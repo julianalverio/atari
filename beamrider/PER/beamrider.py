@@ -198,6 +198,7 @@ class Trainer(object):
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         if torch.cuda.device_count() > 1:
+            print('using %s gpus' % torch.cuda.device_count())
             self.policy_net = nn.DataParallel(self.policy_net)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
