@@ -29,6 +29,7 @@ import sys
 sys.path.insert(0, '..')
 sys.path.insert(0, '.')
 from queues import PrioritizedReplayBuffer as Memory
+from queues import ReplayBuffer
 from wrappers import wrap_dqn
 
 
@@ -148,23 +149,23 @@ class EpsilonTracker:
         return max(self._epsilon, self.epsilon_final)
 
 
-class ReplayMemory(object):
-    def __init__(self, capacity):
-        self.capacity = capacity
-        self.memory = []
-        self.position = 0
-
-    def add(self, *args):
-        if len(self.memory) < self.capacity:
-            self.memory.append(None)
-        self.memory[self.position] = tuple(*args)
-        self.position = (self.position + 1) % self.capacity
-
-    def sample(self, batch_size):
-        return random.sample(self.memory, batch_size)
-
-    def __len__(self):
-        return len(self.memory)
+# class ReplayMemory(object):
+#     def __init__(self, capacity):
+#         self.capacity = capacity
+#         self.memory = []
+#         self.position = 0
+#
+#     def add(self, *args):
+#         if len(self.memory) < self.capacity:
+#             self.memory.append(None)
+#         self.memory[self.position] = tuple(*args)
+#         self.position = (self.position + 1) % self.capacity
+#
+#     def sample(self, batch_size):
+#         return random.sample(self.memory, batch_size)
+#
+#     def __len__(self):
+#         return len(self.memory)
 
 
 class LinearScheduler(object):
@@ -203,7 +204,7 @@ class Trainer(object):
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'done'))
-        self.memory = ReplayMemory(self.params['replay_size'])
+        self.memory = ReplayBuffer(self.params['replay_size'])
         # self.memory = Memory(self.params['replay_size'], 0.6)
         self.beta_scheduler = LinearScheduler(0.4, 1.0, timespan=self.params['epsilon_frames'])
         self.state = self.preprocess(self.env.reset())
