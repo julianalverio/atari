@@ -271,7 +271,7 @@ class Trainer(object):
     def train(self):
         self.prefetch()
         frame_idx = 0
-        for episode in range(3000):
+        for episode in range(300000):
             while 1:
                 frame_idx += 1
                 # play one move
