@@ -29,10 +29,8 @@ import sys
 sys.path.insert(0, '..')
 sys.path.insert(0, '.')
 from queues import PrioritizedReplayBuffer as Memory
-try:
-    from ..wrappers import wrap_dqn
-except:
-    from .wrappers import wrap_dqn
+from wrappers import wrap_dqn
+
 
 
 HYPERPARAMS = {
@@ -156,7 +154,7 @@ class ReplayMemory(object):
         self.memory = []
         self.position = 0
 
-    def push(self, *args):
+    def add(self, *args):
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = tuple(*args)

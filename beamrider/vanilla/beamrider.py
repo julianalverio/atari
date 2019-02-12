@@ -154,7 +154,7 @@ class ReplayMemory(object):
         self.memory = []
         self.position = 0
 
-    def push(self, *args):
+    def add(self, *args):
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = tuple(*args)
